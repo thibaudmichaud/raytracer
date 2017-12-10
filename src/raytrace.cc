@@ -27,16 +27,37 @@ collision collide(const data& data, const ray& r, bool stopfirst)
   return col;
 }
 
-color_t cast(const data& d, ray r, int depth)
+color_t cast(const data& d, ray r, int depth, float eta1)
 {
   if (depth == 0)
     return {0, 0, 0};
   collision col = collide(d, r, false);
   if (col)
     {
+      color_t res = lighting(d, col);
+
       ray refl(col.pos, normalize(r.dir - 2 * col.normal * r.dir * col.normal));
-      return lighting(d, col)
-             + cast(d, refl, depth - 1) * col.texture.refl;
+      res = res + cast(d, refl, depth - 1, eta1) * col.texture.refl;
+
+      float cosi = r.dir * col.normal;
+      float eta2 = col.texture.refr;
+      vector3D n = col.normal;
+      if (cosi < 0)
+        cosi = -cosi;
+      else
+        {
+          std::swap(eta1, eta2);
+          n = -1 * n;
+        }
+      float eta = eta1 / eta2;
+      float k = 1 - eta * eta * (1 - cosi * cosi);
+      if (k >= 0)
+        {
+          vector3D refr_dir = eta * r.dir + (eta * cosi - sqrtf(k)) * n;
+          ray refr(col.pos, refr_dir);
+          res = res + cast(d, refr, depth - 1, eta2) * (1 - col.texture.opac);
+        }
+      return res;
     }
   else
     return {0, 0, 0};
@@ -57,7 +78,7 @@ void raytrace(const data& d, uint8_t *pixels)
       int cj = j - d.height / 2;
       auto pixelpos = c + ci * u + cj * v;
       vector3D dir = normalize(pixelpos - d.cam.pos);
-      color_t color = cast(d, {d.cam.pos, dir}, 6);
+      color_t color = cast(d, {d.cam.pos, dir}, 6, 1);
 
       pixels[(j * d.width + i) * 4 + 0] = color.r;
       pixels[(j * d.width + i) * 4 + 1] = color.g;
