@@ -142,7 +142,7 @@ As said before, we offer two ways to use our raytracer: a basic image rendering 
 \end{figure}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{Implementation}
+\section{Architecture}
 \label{impl}
 
 \IEEEPARstart{T}{he} Figure~\ref{Fig:raycast} shows the camera position and its field-of-view (fov).
@@ -167,7 +167,6 @@ Here are the steps\footnote{This part is heavily based on a subject written by t
 \label{Fig:raycast}
 \end{figure}
 
-\subsection{Architecture}
 A class named data (Figure~\ref{Fig:umldata}) is instantiated at the beginning of
 the program. Then the program parses the input file and fills the data. And since
 Sphere, Plane and Triangle are some type of Object, those specific objects
@@ -252,54 +251,25 @@ makes the rest of the code more generic. We did the same with lights
 \end{figure}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{Performance}
-\label{perf}
-\IEEEPARstart{I}{n} this section we describe the current state of the project,
-the performance analysis that has been done, and the optimizations that are
-planned.
+\section{Camera}
 
-\subsection{Impact of each method}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Features}
 
-\subsection{Optimizations}
-The rendering of a single frame contains three time-consuming operations (see
-Figure~\ref{fig:prof}):
-\begin{itemize}
-\item Device memory allocation (\texttt{cudaMalloc()}) for the scene data (objects, lights, etc.),
-\item Main kernel (\texttt{rt\_eachpx()}),
-\item Data transfer from device to host (\texttt{cudaMemcpy()}).
-\end{itemize}
-In non-interactive mode, the bottleneck is \texttt{cudaMalloc()}.  This is explained by the fact that the first call to \texttt{cudaMalloc()} incurs an inevitable cost that is orders of magnitude higher than the computation time of the main kernel or the data transfer.  When rendering a single frame, this is very significant and this allocation represents between 80\% and 90\% of the total runtime of our application.  But in interactive mode this cost is only paid once, and the subsequent allocations take less than a millisecond each.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Shadows}
 
-The kernel itself takes between 50ms and 100ms with a 1Mpx image (1000x1000). The \texttt{cudaMemcpy()} is negligible for now (below 1ms), which means that we can consistently display between 10 and 20 frames per second in interactive mode.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Refraction}
 
-\subsubsection{Next steps}
-There is a lot to do in terms of performance analysis and optimization. The main points on which we want to focus next are:
-\begin{itemize}
-\item Warp divergence: the main kernel contains many branching statements that probably slow down the application because of warp divergence.  We want to measure the impact of this divergence in terms of performance and rewrite the kernel accordingly.
-\item Try more complex scenes and analyze the performance of the kernel itself.
-\item Play with different block sizes, dimensions, and number of threads per blocks.
-\end{itemize}
-
-There is not much to do in terms of streamlining since the only data transfer (image back to host) is extremely fast compared to the kernel itself.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Perlin}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Difficulties encountered}
-\label{diff}
-\IEEEPARstart{W}{e} faced a few technical issues when translating our first C++ implementation to CUDA.
-\subsection{Derived classes}
-Instances of derived class (such as \texttt{sphere}, \texttt{plane} and \texttt{triangle} which inherit from \texttt{object}) turned out to be harder to handle than expected.  Here are the main problems we had:
-\begin{itemize}
-\item Because of \href{https://en.wikipedia.org/wiki/Object\_slicing}{object slicing}, we cannot create a vector of objects since this would call the copy constructor of the base class, and not of the derived classes. Our solution is to use a vector of pointers and to copy each object individually.  Because of this we have to manage three separate entities: the host vector of host pointers, the host array of device pointers, and the device array of device pointers.
-\item Instances of derived classes can be bigger than their base class, which means we have to \texttt{dynamic\_cast} them individually to check their type and allocate the necessary space.
-\item Most importantly, the pointer to the vtable is invalidated when transferred to the device since it is a \emph{host} pointer.  As-is, the objects are useless after the transfer.  Our solution is to check the objects individually again, and reinstantiate them from the kernel.  This is made harder by the fact that \texttt{dynamic\_cast} is not allowed from the device, preventing us from checking the dynamic types of the objects and instantiating them accordingly.
-\end{itemize}
-Of course, all these problems apply to the \texttt{light} class hierarchy as well.
-\subsection{Thrust library}
-To easily transfer vectors of objects/lights from host to device, we wanted to use the thrust library.  But we found out that thrust's \texttt{device\_vector}s are not meant to be used \emph{from the device}: none of their member functions have the \texttt{\_\_device\_\_} attribute except for the constructor.  Instead, they are meant to be manipulated from the host using the set of provided functions such as \texttt{thrust::transform}, \texttt{thrust::reduce} or \texttt{thrust::for\_each}.  Although we probably could have rewritten our raytracer using only these primitives, this would have defeated the purpose of the assignment.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-\section{\IfLanguageName{english}{Conclusion}{Conclusão}}
+\section{Conclusion}
 \label{concl}
 \IEEEPARstart{A}{s} expected, the CUDA version of our raytracer is way faster than the CPU version on realistic image sizes, without any particular optimization.  We can still improve the performance for a smoother rendering of our real-time interactive mode.  We will start by analyzing the divergence of the warps, which we expect to be very high because of the many branching statements in the device code.
 
