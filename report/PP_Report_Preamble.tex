@@ -42,11 +42,14 @@
 
 % *** SUBFIGURE PACKAGES ***
 \usepackage[caption=false,font=normalsize,labelfont=sf,textfont=sf]{subfig}
-\usepackage{caption}
+\usepackage[style=base]{caption}
 \captionsetup[table]{skip=10pt}
 
 % *** FLOAT PACKAGES ***
-\usepackage{fixltx2e}
+\begingroup\expandafter\expandafter\expandafter\endgroup
+\expandafter\ifx\csname IncludeInRelease\endcsname\relax
+  \usepackage{fixltx2e}
+\fi
 
 % *** PDF, URL AND HYPERLINK PACKAGES ***
 \usepackage{url}
