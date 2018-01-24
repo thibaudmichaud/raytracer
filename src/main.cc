@@ -18,6 +18,8 @@
 #define ANGLE(X) (X * PI) / 180
 #define THETA ANGLE(5)
 
+
+
 void interactive_mode(data& data)
 {
   auto mode = sf::VideoMode(data.width, data.height, 32);
@@ -29,100 +31,125 @@ void interactive_mode(data& data)
   sf::Uint8 *pixels = new sf::Uint8[data.width * data.height * 4];
   raytrace(data, pixels);
   unsigned nframes = 0;
+
+  constexpr double speed = 6.;
+  constexpr double rotation_coef = 1 / 400.;
+  constexpr auto pi_over_two = std::acos(0);
+
+  const vector3D init_pos = data.cam.pos;
+  const vector3D init_right = data.cam.u;
+  const vector3D init_up = data.cam.v;
+  const vector3D init_front = cross(data.cam.v, data.cam.u);;
+
+  vector3D front = init_front;
+  double yaw_roll = -pi_over_two;
+  double pitch_roll = 0.;
+  auto previous_mouse = sf::Mouse::getPosition();
+
+  sf::Clock clock;
+
+
   while (window.isOpen())
   {
-    sf::Event event;
-    while (window.pollEvent(event))
-      if (event.type == sf::Event::Closed)
-        window.close();
-
     bool retrace = false;
-    // Up, Down, Left, Right
-    if (sf::Keyboard::isKeyPressed(sf::Keyboard::LControl)
-        && sf::Keyboard::isKeyPressed(sf::Keyboard::Up))
+    sf::Event event;
+    auto delta_time = clock.getElapsedTime().asSeconds();
+    clock.restart();
+
+    while (window.pollEvent(event))
+    {
+      switch (event.type)
       {
-        data.cam.pos.y -= 1;
-        retrace = true;
+        case sf::Event::Closed:
+        {
+          window.close();
+          break;
+        }
+        case sf::Event::KeyPressed:
+        {
+          if(sf::Keyboard::isKeyPressed(sf::Keyboard::Escape))
+          {
+            window.close();
+            break;
+          }
+          if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up))
+          {
+            data.cam.pos = data.cam.pos - front * speed * delta_time;
+            retrace = true;
+          }
+
+          if (sf::Keyboard::isKeyPressed(sf::Keyboard::Down))
+          {
+            data.cam.pos = data.cam.pos + front * speed * delta_time;
+            retrace = true;
+          }
+
+          if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left))
+          {
+            data.cam.pos = data.cam.pos - data.cam.u * speed * delta_time;
+            retrace = true;
+          }
+
+          if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right))
+          {
+            data.cam.pos = data.cam.pos + data.cam.u * speed * delta_time;
+            retrace = true;
+          }
+
+          if (sf::Keyboard::isKeyPressed(sf::Keyboard::I))
+          {
+            yaw_roll = -pi_over_two;
+            pitch_roll = 0.;
+            data.cam.pos = init_pos;
+            data.cam.u = init_right;
+            data.cam.v = init_up;
+            retrace = true;
+          }
+
+          break;
+        }
+
+        case sf::Event::MouseMoved:
+        {
+          //FIXME NEED to be proofread by aga
+          auto new_position = sf::Mouse::getPosition();
+          if (new_position != previous_mouse)
+          {
+            auto delta_x = new_position.x - previous_mouse.x;
+            auto delta_y = new_position.y - previous_mouse.y;
+
+            yaw_roll -= delta_x * rotation_coef;
+            pitch_roll -= delta_y * rotation_coef;
+            pitch_roll = std::max(std::min(pi_over_two, pitch_roll),
+                                  -pi_over_two);
+
+            auto cos_pitch = std::cos(pitch_roll);
+            auto sin_pitch = std::sin(pitch_roll);
+            auto cos_yaw = std::cos(yaw_roll);
+            auto sin_yaw = std::sin(yaw_roll);
+            front.x = cos_yaw * cos_pitch;
+            front.y = sin_pitch;
+            front.z = sin_yaw * cos_pitch;
+            front = normalize(front);
+            data.cam.u = normalize(cross(front, init_up));
+            data.cam.v = normalize(cross(data.cam.u, front));
+            retrace = true;
+            previous_mouse = new_position;
+          }
+          break;
+        }
+
+        default:
+        {
+        }
       }
-    if (sf::Keyboard::isKeyPressed(sf::Keyboard::LControl)
-        && sf::Keyboard::isKeyPressed(sf::Keyboard::Down))
-      {
-        data.cam.pos.y += 1;
-        retrace = true;
-      }
-    if (sf::Keyboard::isKeyPressed(sf::Keyboard::LControl)
-        && sf::Keyboard::isKeyPressed(sf::Keyboard::Left))
-      {
-        data.cam.pos.x -= 1;
-        retrace = true;
-      }
-    if (sf::Keyboard::isKeyPressed(sf::Keyboard::LControl)
-        && sf::Keyboard::isKeyPressed(sf::Keyboard::Right))
-      {
-        data.cam.pos.x += 1;
-        retrace = true;
-      }
-    // Zoom in out
-    if (sf::Keyboard::isKeyPressed(sf::Keyboard::LShift)
-        && sf::Keyboard::isKeyPressed(sf::Keyboard::Up))
-      {
-        data.cam.pos.z += 1;
-        retrace = true;
-      }
-    if (sf::Keyboard::isKeyPressed(sf::Keyboard::LShift)
-        && sf::Keyboard::isKeyPressed(sf::Keyboard::Down))
-      {
-        data.cam.pos.z -= 1;
-        retrace = true;
-      }
-    // Rotation arround u
-    if (!sf::Keyboard::isKeyPressed(sf::Keyboard::LControl)
-        && !sf::Keyboard::isKeyPressed(sf::Keyboard::LShift)
-        && sf::Keyboard::isKeyPressed(sf::Keyboard::Down))
-      {
-        float v_y = data.cam.v.y * cos(-THETA) - data.cam.v.z * sin(-THETA);
-        float v_z = data.cam.v.y * sin(-THETA) + data.cam.v.z * cos(-THETA);
-        data.cam.v.y = v_y;
-        data.cam.v.z = v_z;
-        retrace = true;
-      }
-    if (!sf::Keyboard::isKeyPressed(sf::Keyboard::LControl)
-        && !sf::Keyboard::isKeyPressed(sf::Keyboard::LShift)
-        && sf::Keyboard::isKeyPressed(sf::Keyboard::Up))
-      {
-        float v_y = data.cam.v.y * cos(THETA) - data.cam.v.z * sin(THETA);
-        float v_z = data.cam.v.y * sin(THETA) + data.cam.v.z * cos(THETA);
-        data.cam.v.y = v_y;
-        data.cam.v.z = v_z;
-        retrace = true;
-      }
-    // Rotation arround v
-    if (!sf::Keyboard::isKeyPressed(sf::Keyboard::LControl)
-        && !sf::Keyboard::isKeyPressed(sf::Keyboard::LShift)
-        && sf::Keyboard::isKeyPressed(sf::Keyboard::Left))
-      {
-        float u_x = data.cam.u.x * cos(-THETA) - data.cam.u.z * sin(-THETA);
-        float u_z = data.cam.u.x * sin(-THETA) + data.cam.u.z * cos(-THETA);
-        data.cam.u.x = u_x;
-        data.cam.u.z = u_z;
-        retrace = true;
-      }
-    if (!sf::Keyboard::isKeyPressed(sf::Keyboard::LControl)
-        && !sf::Keyboard::isKeyPressed(sf::Keyboard::LShift)
-        && sf::Keyboard::isKeyPressed(sf::Keyboard::Right))
-      {
-        float u_x = data.cam.u.x * cos(THETA) - data.cam.u.z * sin(THETA);
-        float u_z = data.cam.u.x * sin(THETA) + data.cam.u.z * cos(THETA);
-        data.cam.u.x = u_x;
-        data.cam.u.z = u_z;
-        retrace = true;
-      }
+    }
 
     if (retrace)
-      {
-        raytrace(data, pixels);
-        ++nframes;
-      }
+    {
+      raytrace(data, pixels);
+      ++nframes;
+    }
 
     window.clear();
     image.create(data.width, data.height, pixels);
@@ -130,6 +157,16 @@ void interactive_mode(data& data)
     sprite.setTexture(texture);
     window.draw(sprite);
     window.display();
+  }
+
+  while (window.isOpen())
+  {
+    sf::Event event;
+    while (window.pollEvent(event))
+      if (event.type == sf::Event::Closed)
+        window.close();
+
+
   }
   delete[] pixels;
 }

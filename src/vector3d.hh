@@ -32,6 +32,11 @@ public:
     return x * other.x + y * other.y + z * other.z;
   }
 
+  vector3D operator*(float value) const
+  {
+    return {x * value, y * value, z * value};
+  }
+
   float x;
   float y;
   float z;
