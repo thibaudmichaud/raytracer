@@ -157,3 +157,5 @@ float plight::specular(const data& d, const collision& col) const
         * normalize(d.cam.pos - col.pos), col.texture.shin)
     * col.texture.spec;
 }
+
+bool opts::refr = false;

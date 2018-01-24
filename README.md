@@ -4,7 +4,7 @@
 
 # Run
 
-    $ ./rt tests/plight >out.ppm
+    $ ./rt -c tests/plight [-i] [-r]
 
 # Sample input
 

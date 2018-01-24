@@ -216,3 +216,8 @@ public:
   std::vector<object*> objs;
   std::vector<light*> lights;
 };
+
+struct opts
+{
+  static bool refr;
+};

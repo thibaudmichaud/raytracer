@@ -1,10 +1,14 @@
+#include <SFML/Graphics.hpp>
 #include <cassert>
 #include <chrono>
 #include <cmath>
+#include <ctype.h>
 #include <fstream>
 #include <iostream>
 #include <sstream>
-#include <SFML/Graphics.hpp>
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
 
 #include "parser.hh"
 #include "ppm.hh"
@@ -142,27 +146,29 @@ void output_mode(data& data)
 
 int main(int argc, char *argv[])
 {
-  if (argc != 3)
-    {
-      std::cerr << "Usage: ./rt <input-file> <interactive>\n\twhere "
-        << "interactive is either 0 or any other number" << std::endl;
-      return EXIT_FAILURE;
-    }
-  std::ifstream config_file(argv[1]);
-  if (!config_file)
+  std::string config_filename;
+  bool interactive(false);
+  char c;
+  while ((c = getopt (argc, argv, "irc:")) != -1)
+    switch (c)
+      {
+        case 'i':
+          interactive = true;
+          break;
+        case 'c':
+          config_filename = optarg;
+          break;
+        case 'r':
+          opts::refr = true;
+          break;
+      }
+  std::ifstream config_stream(config_filename);
+  if (!config_stream)
     {
       std::cerr << "Failed to open the file." << std::endl;
       return EXIT_FAILURE;
     }
-  std::istringstream ss(argv[2]);
-  bool interactive = false;
-  if (!(ss >> interactive))
-    {
-      std::cerr << "interactive must be 0 or any other number" << std::endl;
-      return EXIT_FAILURE;
-    }
-
-  auto data = parse(config_file);
+  auto data = parse(config_stream);
 
   if (interactive)
     interactive_mode(data);

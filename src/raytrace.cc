@@ -1,4 +1,5 @@
 #include <cmath>
+#include <iostream>
 #include <limits>
 
 #include "light.hh"
@@ -39,23 +40,26 @@ color_t cast(const data& d, ray r, int depth, float eta1)
       ray refl(col.pos, normalize(r.dir - 2 * col.normal * r.dir * col.normal));
       res = res + cast(d, refl, depth - 1, eta1) * col.texture.refl;
 
-      float cosi = r.dir * col.normal;
-      float eta2 = col.texture.refr;
-      vector3D n = col.normal;
-      if (cosi < 0)
-        cosi = -cosi;
-      else
+      if (opts::refr)
         {
-          std::swap(eta1, eta2);
-          n = -1 * n;
-        }
-      float eta = eta1 / eta2;
-      float k = 1 - eta * eta * (1 - cosi * cosi);
-      if (k >= 0)
-        {
-          vector3D refr_dir = eta * r.dir + (eta * cosi - sqrtf(k)) * n;
-          ray refr(col.pos, refr_dir);
-          res = res + cast(d, refr, depth - 1, eta2) * (1 - col.texture.opac);
+          float cosi = r.dir * col.normal;
+          float eta2 = col.texture.refr;
+          vector3D n = col.normal;
+          if (cosi < 0)
+            cosi = -cosi;
+          else
+            {
+              std::swap(eta1, eta2);
+              n = -1 * n;
+            }
+          float eta = eta1 / eta2;
+          float k = 1 - eta * eta * (1 - cosi * cosi);
+          if (k >= 0)
+            {
+              vector3D refr_dir = eta * r.dir + (eta * cosi - sqrtf(k)) * n;
+              ray refr(col.pos, refr_dir);
+              res = res + cast(d, refr, depth - 1, eta2) * (1 - col.texture.opac);
+            }
         }
       return res;
     }
