@@ -250,6 +250,37 @@ makes the rest of the code more generic. We did the same with lights
 \label{Fig:umldata}
 \end{figure}
 
+\section{Camera}
+In this section we describe how the right vector, the up vector and the
+position of the camera are updated using the arrow keys of the keyboard and the
+mouse position.
+
+\subsection{Translation}
+
+The arrow keys of the keyboard allow the user to translate the camera following
+the right vector or the front vector. Since we, already have the right vector
+the method is trivial for the left and right arrows, we just need to add to the
+position of the camera the right vector. For the up and down arrow we need to
+define the front vector. This can easily be defined using a cross product between
+the up vector and the right vector.
+
+\subsection{Rotation}
+
+The idea of the rotation is to find the right values of the right and up vectors
+using the pitch roll and yaw roll. At each frame we compute the variation
+of position of the mouse. This variation on the x-axis will affect the yaw
+roll. While the variation on the y-axis will affect the pitch roll. Then
+we compute the right and the up vectors as follows, where init\_up is the
+initial value of the up vector:
+\begin{align*}
+  \text{front.x} := cos(\text{yaw}) * cos(\text{pitch}) \\
+  \text{front.y} := sin(\text{pitch}) \\
+  \text{front.z} := sin(\text{yaw}) * cos(\text{pitch}) \\
+  \text{front} := normalize(\text{front}) \\
+  \text{right} := \text{front} \times \text{init\_up} \\
+  \text{up} := \text{right} \times \text{front} \\
+\end{align*}
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Camera}
 
