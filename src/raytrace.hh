@@ -1,6 +1,7 @@
 #pragma once
 
 #include <cstdint>
+#include <SFML/Graphics.hpp>
 
 #include "data.hh"
 #include "vector3d.hh"
@@ -21,4 +22,4 @@ public:
 
 collision collide(const data& data, const ray& r, bool stopfirst);
 
-void raytrace(const data& data, uint8_t *pixels);
+void raytrace(const data& data, sf::Uint8 *pixels);

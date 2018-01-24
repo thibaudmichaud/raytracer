@@ -4,6 +4,7 @@ OBJ=src/main.o \
     src/data.o \
     src/parser.o \
     src/light.o \
+    src/ppm.o \
     src/raytrace.o
 
 HEADERS=src/collision.hh \

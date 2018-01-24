@@ -63,7 +63,7 @@ color_t cast(const data& d, ray r, int depth, float eta1)
     return {0, 0, 0};
 }
 
-void raytrace(const data& d, uint8_t *pixels)
+void raytrace(const data& d, sf::Uint8 *pixels)
 {
   auto u = normalize(d.cam.u);
   auto v = normalize(d.cam.v);
