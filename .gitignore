@@ -30,3 +30,10 @@
 *.exe
 *.out
 *.app
+
+rt
+*.pdf
+report/report.aux
+report/report.bbl
+report/report.blg
+report/report.log

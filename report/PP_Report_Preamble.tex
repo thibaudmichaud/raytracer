@@ -1,0 +1,94 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%2345678901234567890123456789012345678901234567890123456789012345678901234567890
+%        1         2         3         4         5         6         7         8
+% Required Packages and commands
+% --> Please Choose the MAIN LANGUAGE for the document in package BABEL (below)
+% --> Please Choose the TYPE OF REPORT for the document in \ReportType (below)
+% !TEX root = ./main.tex
+% PP_Report_Preamble.tex
+% V2.1
+% 2017/05/07
+% by Rui Santos Cruz
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+% *** INPUT LANGUAGE PACKAGES ***
+% Choose the main language in package Babel
+\usepackage[main=english,portuguese]{babel}
+\usepackage[utf8]{inputenc}
+\usepackage{iflang}
+
+\usepackage[margin={2cm, 2cm}]{geometry}
+\setlength{\columnsep}{1cm}
+
+% *** ACRONYM PACKAGES ***
+% Put definition of Acronyms at the end of the document
+\usepackage[printonlyused,nolist]{acronym}
+
+% *** CITATION PACKAGES ***
+\usepackage{cite}
+
+% *** GRAPHICS RELATED PACKAGES ***
+\usepackage[pdftex]{graphicx}
+\DeclareGraphicsExtensions{.pdf,.jpeg,.png}
+
+% *** MATH PACKAGES ***
+\usepackage[cmex10]{amsmath}
+
+% *** SPECIALIZED LIST PACKAGES ***
+\usepackage{algorithmic}
+
+% *** ALIGNMENT PACKAGES ***
+\usepackage{array}
+
+% *** SUBFIGURE PACKAGES ***
+\usepackage[caption=false,font=normalsize,labelfont=sf,textfont=sf]{subfig}
+\usepackage{caption}
+\captionsetup[table]{skip=10pt}
+
+% *** FLOAT PACKAGES ***
+\usepackage{fixltx2e}
+
+% *** PDF, URL AND HYPERLINK PACKAGES ***
+\usepackage{url}
+
+% *** BACKGROUND Material ***
+\usepackage{eso-pic}
+\usepackage[
+  contents={},
+  opacity=1,
+  scale=1,
+  color=blue!90
+  ]{background}
+
+% *** CONDITIONALS ***
+\usepackage{ifthen}
+
+% Clever Referencing
+% Note: portuguese is supported through "brazilian" option
+\usepackage[\IfLanguageName{english}{english}{brazilian}]{cleveref}
+
+% Custom Packages
+\usepackage{amsmath}
+\usepackage{graphicx}
+\usepackage{xcolor}
+\definecolor{light-gray}{gray}{0.9}
+\usepackage{tikz}
+\usepackage{float}
+\usetikzlibrary{positioning,shapes,shadows,arrows}
+\tikzstyle{abstract}=[rectangle, draw=black, rounded corners, fill=blue!40, drop shadow,
+        text centered, anchor=north, text=white, text width=2.5cm, node distance= 1cm and 0.3cm]
+\tikzstyle{comment}=[rectangle, draw=black, rounded corners, fill=green, drop shadow,
+        text centered, anchor=north, text=white, text width=2cm]
+\tikzstyle{myarrow}=[->, >=open triangle 90, thick]
+\tikzstyle{line}=[-, thick]
+
+\usepackage{hyperref}
+
+\usepackage{listings}
+\lstset{basicstyle=\ttfamily,
+  showstringspaces=false,
+  commentstyle=\color{red},
+  keywordstyle=\color{blue}
+}
+\usepackage{booktabs}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

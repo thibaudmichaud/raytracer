@@ -17,13 +17,19 @@ HEADERS=src/collision.hh \
         src/light.hh \
         src/vector3d.hh
 
-all: rt
+all: rt report
 
 rt: $(OBJ) $(HEADERS)
 	$(CXX) $(CXXFLAGS) $(LDFLAGS) $(OBJ) -o $@
+	make -C report
+	mv report/report.pdf .
+
+view:
+	xpdf report.pdf
 
 src/cpu/%.o : src/cpu/%.cc
 	$(CXX) $(CXXFLAGS) -Isrc/cpu -c $< -o $@
 
 clean:
 	$(RM) $(OBJ)
+	make clean -C report

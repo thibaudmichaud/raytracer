@@ -1,0 +1,315 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%2345678901234567890123456789012345678901234567890123456789012345678901234567890
+%        1         2         3         4         5         6         7         8
+%% PP_Report.tex
+%% V2.1
+%% 2017/05/07
+%% by Rui Santos Cruz
+%% This is a skeleton file using PPIEEEtran.cls
+%% (requires PPIEEEtran.cls)
+% !TEX root = ./main.tex
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\documentclass[a4paper,12pt,journal,twoside,compsoc]{PPIEEEtran}
+
+% In the ReportType command chose "act" for Activity Report or "learn" for Learnings Report
+\newcommand*{\ReportType}{}
+% -----------------------------------------------------------------------------
+% The Preamble document contains all the necessary Packages for typesetting
+% Modify it to suit your needs
+% -----------------------------------------------------------------------------
+\input{PP_Report_Preamble}
+% correct bad hyphenation here
+\hyphenation{op-tical net-works semi-conduc-tor}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%2345678901234567890123456789012345678901234567890123456789012345678901234567890
+%        1         2         3         4         5         6         7         8
+\begin{document}
+
+\input{PP_Report_Cover}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% The paper Abstract and Keywords
+\IEEEtitleabstractindextext{%
+
+\begin{abstract}
+Today, Ray tracing is exclusively used for non real-time renderies because of
+its slowness compare to rasterization techniques which dominate todays graphics
+hardware. It is believed that ray tracing will not ever challenge rasterization
+techniques. This report modestly contribute to this problem. We present our
+implementation of an optimized C++11 raytracer and discuss about its
+performances.
+\end{abstract}
+%
+\begin{IEEEkeywords}
+Raytracing, CUDA, real-time, rendering, GPU
+\end{IEEEkeywords}}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% make the title area
+\maketitle
+
+\IEEEdisplaynontitleabstractindextext
+\IEEEpeerreviewmaketitle
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Introduction}
+% The very first letter is a 2 line initial drop letter followed
+% by the rest of the first word in caps (small caps for compsoc).
+%
+% form to use if the first word consists of a single letter:
+% \IEEEPARstart{A}{demo} file is ....
+%
+% Here we have the typical use of a "E" for an initial drop letter
+% and "STE" in caps to complete the first word.
+\IEEEPARstart{I}{n} the context of computer graphics, \textit{rendering}~\cite{rendering} is the automatic process of generating an image from a 2D or a 3D model. Two major rendering categories exist: algorithms based on rasterization and those based on raytracing. Historically, raytracing has been used exclusively to produce high-quality images. This approach is well known for its poor performances and long rendering time. If more precision is needed then more time-consumption will occur because more rays will be casted.\\
+\indent In this report, we present a raytracer with two modes: an interactive
+real-time mode with a camera which can be used to walk around the scene and a
+traditional mode that renders a single PPM image. We provide a command-line way
+to enable and disable some features. For instance, you would like to disable
+the refraction when using the interactive mode.\\
+\indent After introducing in Section~\ref{spec} some specifications including
+the input format, we detail our implementation in Section~\ref{impl}. In
+Section~\ref{perf} and Section~\ref{diff}, we discuss about our achieved
+performances and overcomed difficulties.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Specifications}
+\label{spec}
+\IEEEPARstart{T}{his} section gives an overview of the project and explains different ways to use it.
+\subsection{Description}
+The main purpose of this project is to implement a raytracer with different
+features. However, we also provide a real-time mode with the possibility to
+enable or disable any features. This is quite interesting to realise the cost
+of each method. Usually in raytracing, photo-realistic images are incompatible
+with real-time rendering.
+To summarize, from a given input which describes a scene, we give two possibilities:
+\begin{itemize}
+\item render the scene by producing an image and end the process.
+\item enter in an interactive mode with a camera (point-of-view) that can be moved around the scene.
+\end{itemize}
+
+\subsection{Input}
+The format of the input file is shown in~\ref{Fig:input}
+The input file looks like this: \\
+\begin{figure*}
+\noindent\fcolorbox{blue}{light-gray}{%
+    \minipage[t]{\dimexpr1\linewidth-2\fboxsep-2\fboxrule\relax}
+    	screen width height \\
+        camera pos$_x$ pos$_y$ pos$_z$ u$_x$ u$_y$ u$_z$ v$_x$ v$_y$ v$_z$ \\
+        sphere radius pos$_x$ pos$_y$ pos$_z$ diff refl spec shin color$_r$ color$_g$ color$_b$ refr opac \\
+    	plane a b c d diff refl spec shin color$_r$ color$_g$ color$_b$ refr opac \\
+        triangle A$_x$ A$_y$ A$_z$ B$_x$ B$_y$ B$_z$ C$_x$ C$_y$ C$_z$ diff refl spec shin color$_r$ color$_g$ color$_b$ refr opac \\
+        plight pos$_x$ pos$_y$ pos$_z$ color$_r$ color$_g$ color$_b$ \\
+        dlight dir$_x$ dir$_y$ dir$_z$ color$_r$ color$_g$ color$_b$ \\
+        alight color$_r$ color$_g$ color$_b$
+    \endminipage}\vspace{0.3cm}
+\caption{Input file format}
+\label{Fig:input}
+\end{figure*}
+    where:
+    \begin{itemize}
+    	\small
+    	\setlength{\itemsep}{0.2pt}
+        \item camera has a position pos$_x$ pos$_y$ pos$_z$ and looks at the plane formed by the vectors (u$_x$, u$_y$, u$_z$) and (v$_x$, v$_y$, v$_z$).
+        \item plane, triangle, sphere, etc. are the shapes that will be rendered
+        \item (a-d-p)light is for ambiant, directional or point light
+    	\item diff is the diffusion coefficient, between 0 and 1.
+    	\item refl is the reflection coefficient, between 0 and 1.
+        \item spec is the specular coefficient, between 0 and 1.
+        \item shin is the shininess, between 0 and $\infty$. This property is used when implementing the specular light.
+        \item color$_r$, color$_g$, color$_b$ contain three integer values, respectively the red, green and blue components, between 0 and 255.
+		\item refr is the refraction coefficient, between 0 and $\infty$.
+        \item opac is the opacity coefficient, between 0 and 1.
+    \end{itemize}
+For example, the input file of Figure~\ref{Fig:shadow} is the following:\\
+\noindent\fcolorbox{blue}{light-gray}{%
+    \minipage[t]{\dimexpr1\linewidth-2\fboxsep-2\fboxrule\relax}
+    	screen 600 600 \\
+        camera 0 0 0 1 0 0 0 1 0 \\
+		sphere 2 -3 0 20 1 0 0 100 0 255 255 0 0 \\
+		sphere 3 3 0 20 1 0 0 100 255 0 255 0 0 \\
+		plane 0 1 0 -4 1 0 0 100 150 0 0 0 0 \\
+		alight 255 255 255 \\
+		dlight 1 1 0 255 255 255 \\
+		dlight -1 1 0 255 255 255
+    \endminipage}
+
+\subsection{Output}
+As said before, we offer two ways to use our raytracer: a basic image rendering and an interactive mode. The basic mode outputs a picture using the PPM~\cite{ppm} format. In the interactive mode, each time the camera moves, its new coordinates are taken into account and the scene is recomputed. The graphics and events are handled using the SFML~\cite{sfml} library. To move the camera, use the keyboard arrows.
+
+\begin{figure}
+\includegraphics[scale=1]{one}
+\caption{Example of a scene rendered with our raytracer to demonstrate ponctual lights and shadows}
+\label{Fig:shadow}
+\end{figure}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Implementation}
+\label{impl}
+
+\IEEEPARstart{T}{he} Figure~\ref{Fig:raycast} shows the camera position and its field-of-view (fov).
+Here are the steps\footnote{This part is heavily based on a subject written by the ACU 2016 of EPITA.} to compute outgoing screen vectors:
+\begin{itemize}
+\small
+\item Normalize $u$ and $v$.
+\item Compute $w$ using cross-product between $u$ and $v$.
+\item Compute $L$, the distance between the eye and the center of the screen, according to $\tan(\textit{fov}) = \dfrac{\textit{screenwidth}}{2}$
+\item Compute $C$, the center of the screen according to $C - Lw = eye\_pos$.
+\item Now, from $\dfrac{-\textit{screenwidth}}{2}$ to $\dfrac{\textit{screenwidth}}{2}$ and from $\dfrac{-\textit{screenheight}}{2}$ to $\dfrac{\textit{screenheight}}{2}$ :
+	\begin{itemize}
+	\item Compute the point on the screen using $u$ and $v$.
+    \item Using this point and the eye position, compute the outgoing vector.
+    \item Using the position of the camera and the vector from the eye to the point on the screen, cast the ray.
+	\end{itemize}
+\end{itemize}
+
+\begin{figure}
+\includegraphics[scale=1]{two}
+\caption{Raytracing concept}
+\label{Fig:raycast}
+\end{figure}
+
+\subsection{Architecture}
+A class named data (Figure~\ref{Fig:umldata}) is instantiated at the beginning of
+the program. Then the program parses the input file and fills the data. And since
+Sphere, Plane and Triangle are some type of Object, those specific objects
+inherit from a base class Object (Figure~\ref{Fig:umlobj}). Such an implementation
+makes the rest of the code more generic. We did the same with lights
+(Figure~\ref{Fig:umllight}).
+
+\begin{figure}
+\centering
+\begin{tikzpicture}[node distance=2cm]
+    \node (Object) [abstract, rectangle split, rectangle split parts=2]
+        {
+            \textbf{Object}
+            \nodepart{second}intersect()
+        };
+    \node (Plane) [abstract, rectangle split, rectangle split parts=2, below=of Object]
+        {
+            \textbf{Plane}
+            \nodepart{second}intersect()
+        };
+    \node (Sphere) [abstract, rectangle split, rectangle split parts=2, left=of Plane]
+        {
+            \textbf{Sphere}
+            \nodepart{second}intersect()
+        };
+    \node (Triangle) [abstract, rectangle split, rectangle split parts=2, right=of Plane]
+        {
+            \textbf{Triangle}
+            \nodepart{second}intersect()
+        };
+	\draw[myarrow] (Sphere.north) -- ++(0,0.5) -| (Object.south);
+    \draw[line] (Plane.north) -- ++(0,0.6);
+    \draw[line] (Sphere.north) -- ++(0,0.5) -| (Triangle.north);
+\end{tikzpicture}
+\caption{Base class Object and each kind of object that inherits from it.}
+\label{Fig:umlobj}
+\end{figure}
+
+\begin{figure}
+\centering
+\begin{tikzpicture}[node distance=2cm]
+    \node (Light) [abstract, rectangle split, rectangle split parts=2]
+        {
+            \textbf{Light}
+            \nodepart{second}apply()\\in\_shadow()\\factor()
+        };
+    \node (Dlight) [abstract, rectangle split, rectangle split parts=2, below=of Light]
+        {
+            \textbf{Dlight}
+            \nodepart{second}in\_shadow()\\factor()
+        };
+    \node (Alight) [abstract, rectangle split, rectangle split parts=2, left=of Dlight]
+        {
+            \textbf{Alight}
+            \nodepart{second}in\_shadow()\\factor()
+        };
+    \node (Plight) [abstract, rectangle split, rectangle split parts=2, right=of Dlight]
+        {
+            \textbf{Plight}
+            \nodepart{second}in\_shadow()\\factor()
+        };
+	\draw[myarrow] (Alight.north) -- ++(0,0.5) -| (Light.south);
+    \draw[line] (Dlight.north) -- ++(0,0.6);
+    \draw[line] (Alight.north) -- ++(0,0.5) -| (Plight.north);
+\end{tikzpicture}
+\caption{Base class Light and each kind of light that inherits from it.}
+\label{Fig:umllight}
+\end{figure}
+
+\begin{figure}
+\centering
+\begin{tikzpicture}[node distance=2cm]
+    \node (Data) [abstract, rectangle split, rectangle split parts=2]
+        {
+            \textbf{Data}
+            \nodepart{second}width\\height\\vector<Object>\\%
+            vector<Light>
+        };
+\end{tikzpicture}
+\caption{Data class}
+\label{Fig:umldata}
+\end{figure}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Performance}
+\label{perf}
+\IEEEPARstart{I}{n} this section we describe the current state of the project,
+the performance analysis that has been done, and the optimizations that are
+planned.
+
+\subsection{Impact of each method}
+
+\subsection{Optimizations}
+The rendering of a single frame contains three time-consuming operations (see
+Figure~\ref{fig:prof}):
+\begin{itemize}
+\item Device memory allocation (\texttt{cudaMalloc()}) for the scene data (objects, lights, etc.),
+\item Main kernel (\texttt{rt\_eachpx()}),
+\item Data transfer from device to host (\texttt{cudaMemcpy()}).
+\end{itemize}
+In non-interactive mode, the bottleneck is \texttt{cudaMalloc()}.  This is explained by the fact that the first call to \texttt{cudaMalloc()} incurs an inevitable cost that is orders of magnitude higher than the computation time of the main kernel or the data transfer.  When rendering a single frame, this is very significant and this allocation represents between 80\% and 90\% of the total runtime of our application.  But in interactive mode this cost is only paid once, and the subsequent allocations take less than a millisecond each.
+
+The kernel itself takes between 50ms and 100ms with a 1Mpx image (1000x1000). The \texttt{cudaMemcpy()} is negligible for now (below 1ms), which means that we can consistently display between 10 and 20 frames per second in interactive mode.
+
+\subsubsection{Next steps}
+There is a lot to do in terms of performance analysis and optimization. The main points on which we want to focus next are:
+\begin{itemize}
+\item Warp divergence: the main kernel contains many branching statements that probably slow down the application because of warp divergence.  We want to measure the impact of this divergence in terms of performance and rewrite the kernel accordingly.
+\item Try more complex scenes and analyze the performance of the kernel itself.
+\item Play with different block sizes, dimensions, and number of threads per blocks.
+\end{itemize}
+
+There is not much to do in terms of streamlining since the only data transfer (image back to host) is extremely fast compared to the kernel itself.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Difficulties encountered}
+\label{diff}
+\IEEEPARstart{W}{e} faced a few technical issues when translating our first C++ implementation to CUDA.
+\subsection{Derived classes}
+Instances of derived class (such as \texttt{sphere}, \texttt{plane} and \texttt{triangle} which inherit from \texttt{object}) turned out to be harder to handle than expected.  Here are the main problems we had:
+\begin{itemize}
+\item Because of \href{https://en.wikipedia.org/wiki/Object\_slicing}{object slicing}, we cannot create a vector of objects since this would call the copy constructor of the base class, and not of the derived classes. Our solution is to use a vector of pointers and to copy each object individually.  Because of this we have to manage three separate entities: the host vector of host pointers, the host array of device pointers, and the device array of device pointers.
+\item Instances of derived classes can be bigger than their base class, which means we have to \texttt{dynamic\_cast} them individually to check their type and allocate the necessary space.
+\item Most importantly, the pointer to the vtable is invalidated when transferred to the device since it is a \emph{host} pointer.  As-is, the objects are useless after the transfer.  Our solution is to check the objects individually again, and reinstantiate them from the kernel.  This is made harder by the fact that \texttt{dynamic\_cast} is not allowed from the device, preventing us from checking the dynamic types of the objects and instantiating them accordingly.
+\end{itemize}
+Of course, all these problems apply to the \texttt{light} class hierarchy as well.
+\subsection{Thrust library}
+To easily transfer vectors of objects/lights from host to device, we wanted to use the thrust library.  But we found out that thrust's \texttt{device\_vector}s are not meant to be used \emph{from the device}: none of their member functions have the \texttt{\_\_device\_\_} attribute except for the constructor.  Instead, they are meant to be manipulated from the host using the set of provided functions such as \texttt{thrust::transform}, \texttt{thrust::reduce} or \texttt{thrust::for\_each}.  Although we probably could have rewritten our raytracer using only these primitives, this would have defeated the purpose of the assignment.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{\IfLanguageName{english}{Conclusion}{Conclusão}}
+\label{concl}
+\IEEEPARstart{A}{s} expected, the CUDA version of our raytracer is way faster than the CPU version on realistic image sizes, without any particular optimization.  We can still improve the performance for a smoother rendering of our real-time interactive mode.  We will start by analyzing the divergence of the warps, which we expect to be very high because of the many branching statements in the device code.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% references section
+\bibliographystyle{IEEEtran}
+\bibliography{bib}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newpage
+\onecolumn
+
+\end{document}
