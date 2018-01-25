@@ -34,25 +34,16 @@ class object
 {
 public:
   object(float diff, float refl, float spec, unsigned int shin, color_t c,
-         float refr, float opac)
-    : texture_(diff, refl, spec, shin, c, refr, opac)
+         float refr, float opac, float perlin)
+    : texture_(diff, refl, spec, shin, c, refr, opac, perlin)
   {}
 
   virtual ~object()
   {}
 
-  // nvcc doesn't seem to like pure virtual methods, so provide a default
-  // implementation.
   virtual collision intersect(const ray& r) const = 0;
 
   texture_t texture_;
-
-  enum
-  {
-    s, // sphere
-    p, // plane
-    t  // triangle
-  } kind;
 };
 
 class sphere : public object
@@ -60,12 +51,10 @@ class sphere : public object
 public:
   sphere(float diff, float refl, float spec, unsigned int shin, color_t c,
          float refr, float opac, float radius, float pos_x, float pos_y,
-         float pos_z)
-    : object(diff, refl, spec, shin, c, refr, opac),
+         float pos_z, float perlin)
+    : object(diff, refl, spec, shin, c, refr, opac, perlin),
       radius_(radius), pos_(pos_x, pos_y, pos_z)
-  {
-    kind = s;
-  }
+  {}
 
   virtual collision intersect(const ray& r) const override;
 
@@ -78,11 +67,9 @@ class plane : public object
 public:
   plane(float diff, float refl, float spec, unsigned int shin, color_t c,
         float refr, float opac, vector3D n, float d)
-    : object(diff, refl, spec, shin, c, refr, opac),
+    : object(diff, refl, spec, shin, c, refr, opac, 0),
       n(n), d(d)
-  {
-    kind = p;
-  }
+  {}
 
   virtual collision intersect(const ray& r) const override;
 
@@ -97,11 +84,9 @@ public:
            float refr, float opac, float a_x, float a_y, float a_z,
            float b_x, float b_y, float b_z, float c_x, float c_y,
            float c_z)
-    : object(diff, refl, spec, shin, c, refr, opac),
+    : object(diff, refl, spec, shin, c, refr, opac, 0),
       a(a_x, a_y, a_z), b(b_x, b_y, b_z), c(c_x, c_y, c_z)
-  {
-    kind = t;
-  }
+  {}
 
   virtual collision intersect(const ray& r) const override;
 

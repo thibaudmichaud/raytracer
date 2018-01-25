@@ -74,7 +74,7 @@ void raytrace(const data& d, sf::Uint8 *pixels)
   auto w = cross(u, v);
   float l = (d.width / 2) / (tan(FOV / 2));
   auto c = d.cam.pos + l * w;
-#pragma omp parallel for
+// #pragma omp parallel for
   for (unsigned i = 0; i < d.width; i++)
     for (unsigned j = 0; j < d.height; j++)
     {

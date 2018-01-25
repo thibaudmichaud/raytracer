@@ -66,7 +66,7 @@ void parse_sphere(std::istringstream& iss, data& data)
   float pos_x, pos_y, pos_z;
   float diff, refl, spec, shin;
   unsigned color_r, color_g, color_b;
-  float refr, opac;
+  float refr, opac, perlin;
   iss >> radius;
   iss >> pos_x;
   iss >> pos_y;
@@ -80,9 +80,10 @@ void parse_sphere(std::istringstream& iss, data& data)
   iss >> color_b;
   iss >> refr;
   iss >> opac;
+  iss >> perlin;
   data.objs.push_back(new sphere(diff, refl, spec, shin, {color_r, color_g,
                                  color_b}, refr, opac, radius, pos_x, pos_y,
-                                 pos_z));
+                                 pos_z, perlin));
 }
 
 void parse_plane(std::istringstream& iss, data& data)
