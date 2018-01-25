@@ -32,12 +32,11 @@
 \IEEEtitleabstractindextext{%
 
 \begin{abstract}
-Today, Ray tracing is exclusively used for non real-time renderies because of
-its slowness compare to rasterization techniques which dominate todays graphics
-hardware. It is believed that ray tracing will not ever challenge rasterization
-techniques. This report modestly contribute to this problem. We present our
-implementation of an optimized C++11 raytracer and discuss about its
-performances.
+Today, Ray tracing is exclusively used for non real-time renderings because of
+its slowness compared to rasterization techniques which dominate todays graphics
+pipelines. It is believed that raytracing will never challenge rasterization
+techniques. This report modestly contributes to this problem. We present our
+implementation of an optimized C++11 raytracer and discuss about its performances.
 \end{abstract}
 %
 \begin{IEEEkeywords}
@@ -342,7 +341,7 @@ used in several ways.  We can use it to generate random patterns of colors as a
 texture for the objects, as in \cref{fig:perlin-color}.  This picture also
 demonstrates the effect of modifying the frequency of the perlin noise: a higher
 frequency generates smaller patterns.  Another way we can use the perlin noise
-is to randomize the normal of collisions, thus affecting the way the the object
+is to randomize the normal of collisions, thus affecting the way the object
 is rendered at this point as shown in \cref{fig:perlin-normal}.
 
 \begin{figure*}
@@ -362,16 +361,24 @@ is rendered at this point as shown in \cref{fig:perlin-normal}.
 \end{figure*}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{Difficulties encountered}
+\section{Performances}
+Raytracing is highly parallelizable since all pixels can be computed
+independently.  Using OpenMP, we can greatly increase the rendering time by
+using all cores of the machine simultaneously.  Simple images with few lights
+such as \cref{fig:perlin-color} are rendered in about 250ms, while a more complex
+image such as \cref{fig:sample-refr} takes 8.8s because of the great number of
+recursive calls to the \texttt{cast} method.  The same image without the
+refractive spheres is rendered in 1.6s.  All measures were made on an quad-core
+Intel i5-7200U.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Conclusion}
 \label{concl}
 \IEEEPARstart{A}{} C++ implementation of a raytracer has been presented. This
-raytracer contains several features such as refraction and perlin that can
+raytracer contains several features such as refraction and perlin noise that can
 easily be enabled or disabled. We proposed two ways to use our raytracer: an
-interactve mode with a moving camera and a usual mode that outputs a single
-PPM image.
+interactve mode with a moving camera and a usual mode that outputs a single PPM
+image.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
