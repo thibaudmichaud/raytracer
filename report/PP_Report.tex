@@ -10,6 +10,7 @@
 % !TEX root = ./main.tex
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \documentclass[a4paper,12pt,journal,twoside,compsoc]{PPIEEEtran}
+\usepackage{hyperref}
 
 % In the ReportType command chose "act" for Activity Report or "learn" for Learnings Report
 \newcommand*{\ReportType}{}
@@ -292,6 +293,36 @@ initial value of the up vector:
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Refraction}
+
+Refraction is the phenomenon deviating rays of lights when they enter
+transparent objects.  The angle of this deviation is ruled by an equation
+summarized in \cref{fig:refr}, where $n_1$ is the refractive index of the medium
+from which the light comes, and $n_2$ is that of the medium in which it enters.
+\begin{figure}
+  \begin{center}
+    \includegraphics[width=0.7\linewidth]{refraction.png}
+  \end{center}
+  \caption{Refraction law}
+  \label{fig:refr}
+\end{figure}
+
+With some trigonometry, we can compute the angle of this refracted ray.  Since
+some objects are both reflective and refractive, we must throw 2 rays at each
+collision.  For this, we recursively call our \texttt{cast} method twice, once
+for the reflected ray and once for the refracted ray, and multiply the results
+of these casts by the coefficients indicated in the configuration file for the
+object corresponding to the collision.
+
+A sample image with refractive spheres is shown in \cref{fig:sample-refr}.  The
+refractive index of the spheres is that of glass (1.53).
+
+\begin{figure*}
+  \begin{center}
+    \includegraphics[width=0.7\linewidth]{sample-refraction.png}
+  \end{center}
+  \caption{Refractive spheres}
+  \label{fig:sample-refr}
+\end{figure*}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Perlin}
