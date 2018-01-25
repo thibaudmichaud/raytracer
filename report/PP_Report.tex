@@ -333,7 +333,11 @@ refractive index of the spheres is that of glass (1.53).
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Conclusion}
 \label{concl}
-\IEEEPARstart{A}{s} expected, the CUDA version of our raytracer is way faster than the CPU version on realistic image sizes, without any particular optimization.  We can still improve the performance for a smoother rendering of our real-time interactive mode.  We will start by analyzing the divergence of the warps, which we expect to be very high because of the many branching statements in the device code.
+\IEEEPARstart{A}{} C++ implementation of a raytracer has been presented. This
+raytracer contains several features such as refraction and perlin that can
+easily be enabled or disabled. We proposed two ways to use our raytracer: an
+interactve mode with a moving camera and a usual mode that outputs a single
+PPM image.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
