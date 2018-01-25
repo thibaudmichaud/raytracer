@@ -91,7 +91,7 @@ void parse_plane(std::istringstream& iss, data& data)
   float a, b, c, d;
   float diff, refl, spec, shin;
   unsigned color_r, color_g, color_b;
-  float refr, opac;
+  float refr, opac, perlin;
   iss >> a;
   iss >> b;
   iss >> c;
@@ -105,8 +105,9 @@ void parse_plane(std::istringstream& iss, data& data)
   iss >> color_b;
   iss >> refr;
   iss >> opac;
+  iss >> perlin;
   data.objs.push_back(new plane(diff, refl, spec, shin, {color_r, color_g,
-                                color_b}, refr, opac, normalize({a, b, c}), d));
+                                color_b}, refr, opac, normalize({a, b, c}), d, perlin));
 }
 
 void parse_triangle(std::istringstream& iss, data& data)

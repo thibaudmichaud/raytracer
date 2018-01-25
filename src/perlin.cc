@@ -60,14 +60,17 @@ float perlin(float x, float y, float z, size_t seed, float res)
     z /= res;
 
     //On récupère les positions de la grille associée à (x,y)
-    int x0 = floor(x);
-    int y0 = floor(y);
-    int z0 = floor(z);
+    long x0 = floor(x);
+    long y0 = floor(y);
+    long z0 = floor(z);
 
     //Masquage
-    int i = x0 % 255;
-    int j = y0 % 255;
-    int k = z0 % 255;
+    long i = (x0 + std::numeric_limits<long>::max() / 2) % 255;
+    long j = (y0 + std::numeric_limits<long>::max() / 2) % 255;
+    long k = (z0 + std::numeric_limits<long>::max() / 2) % 255;
+    assert(i >= 0);
+    assert(j >= 0);
+    assert(k >= 0);
 
     //Pour récupérer les vecteurs
     int g[2][2][2];

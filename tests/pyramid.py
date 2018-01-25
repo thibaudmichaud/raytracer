@@ -10,15 +10,15 @@ shin = 50
 refr = 1
 opac = 1
 
-def draw_line(r, num, x, y, z, col_r, col_g, col_b):
+def draw_line(r, num, x, y, z, col_r, col_g, col_b, perlin):
     spheres = []
     for i in range(num):
-        spheres.append('sphere {} {} {} {} {} {} {} {} {} {} {} {} {}'.format
+        spheres.append('sphere {} {} {} {} {} {} {} {} {} {} {} {} {} {}'.format
                 (r, x + (2* r * i), y, -z, diff, refl, spec, shin, col_r, col_g,
-                 col_b, refr, opac))
+                 col_b, refr, opac, perlin))
     return spheres
 
-def pyramid(floor, r, x_st, y_st, z_st, color_r, color_g, color_b):
+def pyramid(floor, r, x_st, y_st, z_st, color_r, color_g, color_b, perlin):
     num = floor
 
     x_d = r
@@ -29,10 +29,8 @@ def pyramid(floor, r, x_st, y_st, z_st, color_r, color_g, color_b):
     while (floor > 0):
         num = floor
         x, y, z = x_st, y_st, z_st
-        print('floor ' + str(floor))
         while(num > 0):
-            print('num ' + str(num))
-            lines.extend(draw_line(r, num, x, y, z, color_r, color_g, color_b))
+            lines.extend(draw_line(r, num, x, y, z, color_r, color_g, color_b, perlin))
             num -= 1
             x += r
             z += r * math.sqrt(3)
@@ -51,14 +49,13 @@ def main():
              'alight 100 100 80',
              'dlight 0 0 1 100 100 100']
 
-    lines.extend(pyramid(2, 1, -7, 1, -20, 255, 0, 0))
-    lines.extend(pyramid(3, 1, -7, 1, -27, 0, 255, 0))
-    lines.extend(pyramid(4, 1, -4, 1, -34, 0, 0, 255))
-    lines.extend(pyramid(5, 1, 2, 1, -27, 255, 255, 0))
+    lines.extend(pyramid(2, 1, -7, 1, -20, 255, 0, 0, 0))
+    lines.extend(pyramid(3, 1, -7, 1, -27, 0, 255, 0, 0))
+    lines.extend(pyramid(4, 1, -4, 1, -34, 0, 0, 255, 0))
+    lines.extend(pyramid(5, 1, 2, 1, -27, 255, 255, 0, 0))
 
-    with open('pyramid', 'w') as f:
-        for line in lines:
-            f.write(line + '\n')
+    for line in lines:
+        print(line)
 
 if __name__ == '__main__':
     main()

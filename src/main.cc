@@ -19,8 +19,6 @@
 #define ANGLE(X) (X * PI) / 180
 #define THETA ANGLE(5)
 
-
-
 void interactive_mode(data& data)
 {
   auto mode = sf::VideoMode(data.width, data.height, 32);
@@ -187,7 +185,7 @@ int main(int argc, char *argv[])
   std::string config_filename;
   bool interactive(false);
   char c;
-  while ((c = getopt (argc, argv, "irc:")) != -1)
+  while ((c = getopt (argc, argv, "irnc:")) != -1)
     switch (c)
       {
         case 'i':
@@ -198,6 +196,9 @@ int main(int argc, char *argv[])
           break;
         case 'r':
           opts::refr = true;
+          break;
+        case 'n':
+          opts::perlin_normal = true;
           break;
       }
   std::ifstream config_stream(config_filename);
@@ -213,41 +214,3 @@ int main(int argc, char *argv[])
   else
     output_mode(data);
 }
-
-// int main()
-// {
-// #define W 400
-// #define H 400
-//   auto mode = sf::VideoMode(W, H, 32);
-//   sf::RenderWindow window(mode, "RayTracer");
-//   sf::Image image;
-//   sf::Sprite sprite;
-//   sf::Texture texture;
-//   texture.create(W, H);
-//   sf::Uint8 *pixels = new sf::Uint8[W * H * 4];
-//   for (int i = 0; i < H; ++i)
-//     for (int j = 0; j < W; ++j)
-//       {
-//         float p = perlin(1, i / (float)W, j / (float)H, 0.1);
-//         p = (p + 1) * 0.5 * 255;
-//         pixels[(i * W + j) * 4] = p;
-//         pixels[(i * W + j) * 4 + 1] = p;
-//         pixels[(i * W + j) * 4 + 2] = p;
-//         pixels[(i * W + j) * 4 + 3] = 255;
-//       }
-//   while (window.isOpen())
-//   {
-//     sf::Event event;
-//     while (window.pollEvent(event))
-//       if (event.type == sf::Event::Closed)
-//         window.close();
-// 
-//     window.clear();
-//     image.create(W, H, pixels);
-//     texture.update(image);
-//     sprite.setTexture(texture);
-//     window.draw(sprite);
-//     window.display();
-//   }
-//   delete[] pixels;
-// }

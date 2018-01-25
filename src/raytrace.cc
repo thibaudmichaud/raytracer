@@ -4,6 +4,7 @@
 
 #include "light.hh"
 #include "data.hh"
+#include "perlin.hh"
 #include "raytrace.hh"
 
 collision collide(const data& data, const ray& r, bool stopfirst)
@@ -25,6 +26,21 @@ collision collide(const data& data, const ray& r, bool stopfirst)
       }
     }
   }
+  if (col && col.texture.perlin != 0)
+    {
+      float r = perlin(col.pos.x, col.pos.y, col.pos.z, 0, col.texture.perlin);
+      float g = perlin(col.pos.x, col.pos.y, col.pos.z, 1, col.texture.perlin);
+      float b = perlin(col.pos.x, col.pos.y, col.pos.z, 2, col.texture.perlin);
+      if (opts::perlin_normal)
+        col.normal = normalize(col.normal + vector3D(r / 3, g / 3, b / 3));
+      else
+        {
+          unsigned ur = (r + 1) * 0.5 * 255;
+          unsigned ug = (g + 1) * 0.5 * 255;
+          unsigned ub = (b + 1) * 0.5 * 255;
+          col.texture.color = {ur, ug, ub};
+        }
+    }
   return col;
 }
 

@@ -5,7 +5,6 @@
 
 #include "data.hh"
 #include "raytrace.hh"
-#include "perlin.hh"
 
 #define EPSILON 0.01
 #define LA 0.2
@@ -31,13 +30,6 @@ collision sphere::intersect(const ray& r) const
         normalize((r.pos + t * r.dir) - pos_),
         texture_
       };
-      float r = perlin(col.pos.x, col.pos.y, col.pos.z, 0, texture_.perlin);
-      unsigned ur = (r + 1) * 0.5 * 255;
-      float g = perlin(col.pos.x, col.pos.y, col.pos.z, 1, texture_.perlin);
-      unsigned ug = (g + 1) * 0.5 * 255;
-      float b = perlin(col.pos.x, col.pos.y, col.pos.z, 2, texture_.perlin);
-      unsigned ub = (b + 1) * 0.5 * 255;
-      col.texture.color = {ur, ug, ub};
     }
   }
   return col;
@@ -59,9 +51,6 @@ collision plane::intersect(const ray& r) const
           };
         }
     }
-  float p = perlin(col.pos.x, col.pos.y, col.pos.z, 0, 1);
-  unsigned c = (p + 1) * 0.5 * 255;
-  col.texture.color = {c, c, c};
   return col;
 }
 
@@ -73,7 +62,7 @@ collision triangle::intersect(const ray& r) const
   float d = norm.x * a.x
              - norm.y * a.y
              - norm.z * a.z;
-  plane test(0, 0, 0, 0, {0, 0, 0}, 0, 0, norm, d);
+  plane test(0, 0, 0, 0, {0, 0, 0}, 0, 0, norm, d, 0);
   collision col = test.intersect(r);
   if (col)
   {
@@ -170,3 +159,4 @@ float plight::specular(const data& d, const collision& col) const
 }
 
 bool opts::refr = false;
+bool opts::perlin_normal = false;

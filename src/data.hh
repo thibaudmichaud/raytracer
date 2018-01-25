@@ -66,8 +66,8 @@ class plane : public object
 {
 public:
   plane(float diff, float refl, float spec, unsigned int shin, color_t c,
-        float refr, float opac, vector3D n, float d)
-    : object(diff, refl, spec, shin, c, refr, opac, 0),
+        float refr, float opac, vector3D n, float d, float perlin)
+    : object(diff, refl, spec, shin, c, refr, opac, perlin),
       n(n), d(d)
   {}
 
@@ -205,4 +205,5 @@ public:
 struct opts
 {
   static bool refr;
+  static bool perlin_normal;
 };
