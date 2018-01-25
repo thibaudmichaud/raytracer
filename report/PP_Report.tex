@@ -287,10 +287,14 @@ initial value of the up vector:
 \end{align*}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{Camera}
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Shadows}
+To compute shadows when casting a ray from the object visible through a particular
+pixel of the frame, from the point of intersection to the light source, If this
+ray which we call a shadow ray intersects an object on its way to the light,
+then the point that we are rendering is in the shadow of that object.\\
+
+\indent Instead of computing intersections with all objects, as soon as we
+know that an intesection happened with a single object, we stop.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Refraction}
