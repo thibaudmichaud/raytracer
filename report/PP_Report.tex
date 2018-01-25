@@ -255,7 +255,7 @@ makes the rest of the code more generic. We did the same with lights
 
 \section{Camera}
 \label{cam}
-In this section we describe how the right vector, the up vector and the
+\IEEEPARstart{I}{n} this section we describe how the right vector, the up vector and the
 position of the camera are updated using the arrow keys of the keyboard and the
 mouse position.
 
@@ -286,8 +286,7 @@ initial value of the up vector:
 \end{align*}
 
 \section{Depth of Field}
-
-On Figure~\ref{fig:dof}, we can observe the depth of field effect. The idea
+\IEEEPARstart{O}{n} Figure~\ref{fig:dof}, we can observe the depth of field effect. The idea
 is to focus on an object at a given distance and to blur the rest.
 
 \begin{figure}
@@ -300,7 +299,8 @@ is to focus on an object at a given distance and to blur the rest.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Shadows}
-When a collision has been found, each light source must be taken into account to
+\IEEEPARstart{W}{hen}
+a collision has been found, each light source must be taken into account to
 compute the color at this point.  But when an object is between the light source
 and the point of collision, this means this collision is in the shadow of this
 object and the source of light should not be taken into account.
@@ -315,8 +315,8 @@ know that an intesection happened with a single object, we stop.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Refraction}
-
-Refraction is the phenomenon deviating rays of lights when they enter
+\IEEEPARstart{R}{efraction}
+is the phenomenon deviating rays of lights when they enter
 transparent objects.  The angle of this deviation is ruled by an equation
 summarized in \cref{fig:refr}, where $n_1$ is the refractive index of the medium
 from which the light comes, and $n_2$ is that of the medium in which it enters.
@@ -348,8 +348,8 @@ refractive index of the spheres is that of glass (1.53).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Perlin}
-
-Perlin noise is the most common technique for generating random but coherent
+\IEEEPARstart{P}{erlin}
+noise is the most common technique for generating random but coherent
 patterns.  It is based on the computation of random gradients on the vertices of
 an n dimensional grid, and the values at each point in the continuous space is
 computed based on an interpolation of these gradients.  The closer a point is
@@ -380,7 +380,8 @@ is rendered at this point as shown in \cref{fig:perlin-normal}.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Performances}
-Raytracing is highly parallelizable since all pixels can be computed
+\IEEEPARstart{R}{aytracing}
+is highly parallelizable since all pixels can be computed
 independently.  Using OpenMP, we can greatly increase the rendering time by
 using all cores of the machine simultaneously.  Simple images with few lights
 such as \cref{fig:perlin-color} (800x600) are rendered in about 250ms, while a
