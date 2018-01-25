@@ -330,6 +330,35 @@ refractive index of the spheres is that of glass (1.53).
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Perlin}
 
+Perlin noise is the most common technique for generating random but coherent
+patterns.  It is based on the computation of random gradients on the vertices of
+an n dimensional grid, and the values at each point in the continuous space is
+computed based on an interpolation of these gradients.  The closer a point is
+from a vertice of the grid, the higher the contribution of the corresponding
+gradient to the final value assigned to this point.  The computed value can be
+used in several ways.  We can use it to generate random patterns of colors as a
+texture for the objects, as in \cref{fig:perlin-color}.  This picture also
+demonstrates the effect of modifying the frequency of the perlin noise: a higher
+frequency generates smaller patterns.  Another way we can use the perlin noise
+is to randomize the normal of collisions, thus affecting the way the the object
+is rendered at this point as shown in \cref{fig:perlin-normal}.
+
+\begin{figure*}
+  \begin{center}
+    \includegraphics[width=0.7\linewidth]{perlin-color.png}
+  \end{center}
+  \caption{Perlin noise on object's color with various frequencies.}
+  \label{fig:perlin-color}
+\end{figure*}
+
+\begin{figure*}
+  \begin{center}
+    \includegraphics[width=0.7\linewidth]{perlin-normal.png}
+  \end{center}
+  \caption{Perlin noise on a plane's normal.}
+  \label{fig:perlin-normal}
+\end{figure*}
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Difficulties encountered}
 
