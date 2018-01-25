@@ -68,9 +68,10 @@ traditional mode that renders a single PPM image. We provide a command-line way
 to enable and disable some features. For instance, you would like to disable
 the refraction when using the interactive mode.\\
 \indent After introducing in Section~\ref{spec} some specifications including
-the input format, we detail our implementation in Section~\ref{impl}. In
-Section~\ref{perf} and Section~\ref{diff}, we discuss about our achieved
-performances and overcomed difficulties.
+the input format, we detail our architecture in Section~\ref{impl}. From
+Section~\ref{cam} to the end, we discuss about the implementation of
+different part of the project.
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Specifications}
 \label{spec}
@@ -89,6 +90,7 @@ To summarize, from a given input which describes a scene, we give two possibilit
 
 \subsection{Input}
 The format of the input file is shown in~\ref{Fig:input}
+
 The input file looks like this: \\
 \begin{figure*}
 \noindent\fcolorbox{blue}{light-gray}{%
@@ -252,6 +254,7 @@ makes the rest of the code more generic. We did the same with lights
 \end{figure}
 
 \section{Camera}
+\label{cam}
 In this section we describe how the right vector, the up vector and the
 position of the camera are updated using the arrow keys of the keyboard and the
 mouse position.
