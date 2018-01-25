@@ -383,11 +383,11 @@ is rendered at this point as shown in \cref{fig:perlin-normal}.
 Raytracing is highly parallelizable since all pixels can be computed
 independently.  Using OpenMP, we can greatly increase the rendering time by
 using all cores of the machine simultaneously.  Simple images with few lights
-such as \cref{fig:perlin-color} are rendered in about 250ms, while a more complex
-image such as \cref{fig:sample-refr} takes 8.8s because of the great number of
-recursive calls to the \texttt{cast} method.  The same image without the
-refractive spheres is rendered in 1.6s.  All measures were made on an quad-core
-Intel i5-7200U.
+such as \cref{fig:perlin-color} (800x600) are rendered in about 250ms, while a
+more complex image such as \cref{fig:sample-refr} (1280x1024) takes 41s because
+of the great number of recursive calls to the \texttt{cast} method.  The same
+image without the refractive spheres is rendered in 1.6s.  All measures were
+made on an quad-core Intel i5-7200U.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Conclusion}
