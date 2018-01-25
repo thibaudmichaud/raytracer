@@ -287,10 +287,15 @@ initial value of the up vector:
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Shadows}
-To compute shadows when casting a ray from the object visible through a particular
-pixel of the frame, from the point of intersection to the light source, If this
-ray which we call a shadow ray intersects an object on its way to the light,
-then the point that we are rendering is in the shadow of that object.\\
+When a collision has been found, each light source must be taken into account to
+compute the color at this point.  But when an object is between the light source
+and the point of collision, this means this collision is in the shadow of this
+object and the source of light should not be taken into account.
+
+To know whether a given collision is in a shadow for a source of light, we
+simply throw another ray from that collision towards the source of light and
+check for intersections.  If there is an intersection, the light source does not
+contribute to the color of the current pixel.
 
 \indent Instead of computing intersections with all objects, as soon as we
 know that an intesection happened with a single object, we stop.
