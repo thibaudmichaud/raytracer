@@ -277,12 +277,12 @@ roll. While the variation on the y-axis will affect the pitch roll. Then
 we compute the right and the up vectors as follows, where init\_up is the
 initial value of the up vector:
 \begin{align*}
-  \text{front.x} := cos(\text{yaw}) * cos(\text{pitch}) \\
-  \text{front.y} := sin(\text{pitch}) \\
-  \text{front.z} := sin(\text{yaw}) * cos(\text{pitch}) \\
-  \text{front} := normalize(\text{front}) \\
-  \text{right} := \text{front} \times \text{init\_up} \\
-  \text{up} := \text{right} \times \text{front} \\
+  \text{front.x} &:= cos(\text{yaw}) * cos(\text{pitch}) \\
+  \text{front.y} &:= sin(\text{pitch}) \\
+  \text{front.z} &:= sin(\text{yaw}) * cos(\text{pitch}) \\
+  \text{front} &:= normalize(\text{front}) \\
+  \text{right} &:= \text{front} \times \text{init\_up} \\
+  \text{up} &:= \text{right} \times \text{front} \\
 \end{align*}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
