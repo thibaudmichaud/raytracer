@@ -206,4 +206,7 @@ struct opts
 {
   static bool refr;
   static bool perlin_normal;
+  static bool depth_of_field;
+  static double focal_length;
+  static double focal_variation;
 };

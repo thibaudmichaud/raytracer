@@ -160,3 +160,6 @@ float plight::specular(const data& d, const collision& col) const
 
 bool opts::refr = false;
 bool opts::perlin_normal = false;
+bool opts::depth_of_field = false;
+double opts::focal_length = 10.;
+double opts::focal_variation = 1.;

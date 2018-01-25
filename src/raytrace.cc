@@ -98,7 +98,41 @@ void raytrace(const data& d, sf::Uint8 *pixels)
       int cj = j - d.height / 2;
       auto pixelpos = c + ci * u + cj * v;
       vector3D dir = normalize(pixelpos - d.cam.pos);
-      color_t color = cast(d, {d.cam.pos, dir}, 6, 1);
+      color_t color;
+
+      if (!opts::depth_of_field)
+        color = cast(d, {d.cam.pos, dir}, 6, 1);
+      else
+      {
+        //auto color2 = cast(d, {d.cam.pos, dir}, 6, 1);
+        auto focal_point = dir * opts::focal_length;
+        for (auto x_var: {-1, 0, 1})
+          for (auto y_var: {-1, 0, 1})
+          {
+            auto current_pos = c + (ci + x_var * opts::focal_variation) * u +
+                                   (cj + y_var * opts::focal_variation) * v;
+            vector3D current_dir = normalize(current_pos - focal_point);
+            auto tmp_color = cast(d, {d.cam.pos, current_dir}, 6, 1);
+            color = color + tmp_color / 9.;
+            /*
+            if (color.r != 0)
+            std::cerr << "focal " << focal_point.x << " "
+                      << focal_point.y << " "
+                      << focal_point.z
+                      << " dir " << dir.x  << " "
+                      << dir.y << " " << dir.z
+                      << " new dir " << current_dir.x
+                      << " " << current_dir.y << " " << current_dir.z << std::endl
+                      << " color " << color.r << " " << color.g << " " << color.b;
+                      */
+          }
+        /*
+        if (color.r != 0)
+        std::cerr << "var " << (color2.r - color.r)
+                  << " " << (color2.g - color.g)
+                  << " " << (color2.b - color.b) << std::endl;
+                  */
+      }
 
       pixels[(j * d.width + i) * 4 + 0] = color.r;
       pixels[(j * d.width + i) * 4 + 1] = color.g;

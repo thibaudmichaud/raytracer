@@ -31,7 +31,7 @@ void interactive_mode(data& data)
   raytrace(data, pixels);
   unsigned nframes = 0;
 
-  constexpr double speed = 6.;
+  constexpr double speed = 30.;
   constexpr double rotation_coef = 1 / 400.;
   constexpr auto pi_over_two = std::acos(0);
 
@@ -52,7 +52,6 @@ void interactive_mode(data& data)
   {
     bool retrace = false;
     sf::Event event;
-    auto delta_time = clock.getElapsedTime().asSeconds();
     clock.restart();
 
     while (window.pollEvent(event))
@@ -73,25 +72,25 @@ void interactive_mode(data& data)
           }
           if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up))
           {
-            data.cam.pos = data.cam.pos - front * speed * delta_time;
+            data.cam.pos = data.cam.pos - front * speed;
             retrace = true;
           }
 
           if (sf::Keyboard::isKeyPressed(sf::Keyboard::Down))
           {
-            data.cam.pos = data.cam.pos + front * speed * delta_time;
+            data.cam.pos = data.cam.pos + front * speed;
             retrace = true;
           }
 
           if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left))
           {
-            data.cam.pos = data.cam.pos - data.cam.u * speed * delta_time;
+            data.cam.pos = data.cam.pos - data.cam.u * speed;
             retrace = true;
           }
 
           if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right))
           {
-            data.cam.pos = data.cam.pos + data.cam.u * speed * delta_time;
+            data.cam.pos = data.cam.pos + data.cam.u * speed;
             retrace = true;
           }
 
@@ -102,6 +101,45 @@ void interactive_mode(data& data)
             data.cam.pos = init_pos;
             data.cam.u = init_right;
             data.cam.v = init_up;
+            opts::focal_length = 10.;
+            opts::focal_variation = 1.;
+            opts::depth_of_field = false;
+            retrace = true;
+          }
+
+          if (sf::Keyboard::isKeyPressed(sf::Keyboard::D))
+          {
+            opts::depth_of_field = !opts::depth_of_field;
+            retrace = true;
+          }
+
+          if (sf::Keyboard::isKeyPressed(sf::Keyboard::A))
+          {
+            opts::focal_length = std::min(100., opts::focal_length + 0.5);
+            std::cout << "focal length " << opts::focal_length << std::endl;
+            retrace = true;
+          }
+
+          if (sf::Keyboard::isKeyPressed(sf::Keyboard::S))
+          {
+            opts::focal_length = std::max(1., opts::focal_length - 0.5);
+            std::cout << "focal length " << opts::focal_length << std::endl;
+            retrace = true;
+          }
+
+          if (sf::Keyboard::isKeyPressed(sf::Keyboard::Z))
+          {
+            opts::focal_variation = std::min(30., opts::focal_variation + 0.1);
+            std::cout << "focal variation " << opts::focal_variation
+                      << std::endl;
+            retrace = true;
+          }
+
+          if (sf::Keyboard::isKeyPressed(sf::Keyboard::X))
+          {
+            opts::focal_variation = std::max(0., opts::focal_variation - 0.1);
+            std::cout << "focal variation " << opts::focal_variation
+                      << std::endl;
             retrace = true;
           }
 
